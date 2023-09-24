@@ -44,4 +44,12 @@ public class BookManagerServiceImpl implements BookManagerService {
         bookManagerRepository.save(retrievedBook);
     }
 
+    @Override
+    public void deleteByBookId(Long id) {
+        // Only delete it if it's there!
+        if (bookManagerRepository.findById(id).isPresent()) {
+            bookManagerRepository.deleteById(id);
+        }
+    }
+
 }
