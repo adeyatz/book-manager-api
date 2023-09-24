@@ -50,6 +50,7 @@ public class BookManagerServiceImpl implements BookManagerService {
         if (bookManagerRepository.findById(id).isPresent()) {
             bookManagerRepository.deleteById(id);
         }
+        // else How do we report an error??
     }
 
 }
