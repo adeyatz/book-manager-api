@@ -124,4 +124,18 @@ public class BookManagerControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+
+    @Test
+     void testDeleteBookByBadId() throws Exception {
+
+        Book book = new Book(7L, "Book Seven", "This is the description for Book 7", "Person 7", Genre.Fantasy);
+
+        when(mockBookManagerServiceImpl.getBookById(book.getId()+1)).thenReturn(book);
+        when(mockBookManagerServiceImpl.deleteByBookId(book.getId()+1)).thenReturn((false));
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.delete("/api/v1/book/" + book.getId() + 1))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
 }
