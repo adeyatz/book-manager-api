@@ -90,9 +90,23 @@ public class BookManagerServiceTests {
         when(mockBookManagerRepository.findById(bookId)).thenReturn(Optional.of(book));
 
 
-        bookManagerServiceImpl.deleteByBookId (bookId);
+        assertThat(bookManagerServiceImpl.deleteByBookId (bookId)).isEqualTo(true);
 
         verify (mockBookManagerRepository, times (1)).deleteById(bookId);
-        assertThat (mockBookManagerRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    public void testDeleteBookByIdNoMatch() {
+
+        Long bookId = 1L;
+        var book = new Book(bookId, "Book Seven", "This is the description for Book 7", "Person 7", Genre.Fantasy);
+
+        when(mockBookManagerRepository.findById(bookId + 1)).thenReturn(Optional.ofNullable(null));
+
+
+        assertThat (bookManagerServiceImpl.deleteByBookId (bookId + 1)).isEqualTo(false);
+
+        verify (mockBookManagerRepository, times (1)).findById(bookId + 1) ;
     }
 }
+

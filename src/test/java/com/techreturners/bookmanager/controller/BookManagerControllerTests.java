@@ -117,6 +117,7 @@ public class BookManagerControllerTests {
         Book book = new Book(6L, "Book Six", "This is the description for Book Six", "Person Six", Genre.Fantasy);
 
         when(mockBookManagerServiceImpl.getBookById(book.getId())).thenReturn(book);
+        when(mockBookManagerServiceImpl.deleteByBookId(book.getId())).thenReturn((true));
 
         this.mockMvcController.perform(
                         MockMvcRequestBuilders.delete("/api/v1/book/" + book.getId()))

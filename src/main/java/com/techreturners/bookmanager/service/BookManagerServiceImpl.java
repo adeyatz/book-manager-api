@@ -45,12 +45,14 @@ public class BookManagerServiceImpl implements BookManagerService {
     }
 
     @Override
-    public void deleteByBookId(Long id) {
+    public boolean deleteByBookId(Long id) {
         // Only delete it if it's there!
         if (bookManagerRepository.findById(id).isPresent()) {
             bookManagerRepository.deleteById(id);
+            return true;
         }
         // else How do we report an error??
+        return false;
     }
 
 }
