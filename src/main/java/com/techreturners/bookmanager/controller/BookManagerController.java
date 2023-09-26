@@ -44,9 +44,10 @@ public class BookManagerController {
     }
 
     @DeleteMapping({"/{bookId}"})
-    public ResponseEntity<Book> deleteBookById(@PathVariable Long bookId) {
-        bookManagerService.deleteByBookId(bookId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<String> deleteBookById(@PathVariable Long bookId) {
+        return bookManagerService.deleteByBookId(bookId)
+                ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(("Cannot find book with id " + bookId), HttpStatus.BAD_REQUEST);
     }
 
 }
