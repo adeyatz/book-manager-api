@@ -1,5 +1,6 @@
 package com.techreturners.bookmanager.service;
 
+import com.techreturners.bookmanager.exceptions.BookNotFoundException;
 import com.techreturners.bookmanager.model.Book;
 import com.techreturners.bookmanager.model.Genre;
 
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 @DataJpaTest
@@ -89,8 +92,7 @@ public class BookManagerServiceTests {
 
         when(mockBookManagerRepository.findById(bookId)).thenReturn(Optional.of(book));
 
-
-        assertThat(bookManagerServiceImpl.deleteByBookId (bookId)).isEqualTo(true);
+        bookManagerServiceImpl.deleteByBookId (bookId);
 
         verify (mockBookManagerRepository, times (1)).deleteById(bookId);
     }
@@ -103,8 +105,12 @@ public class BookManagerServiceTests {
 
         when(mockBookManagerRepository.findById(bookId + 1)).thenReturn(Optional.ofNullable(null));
 
-
-        assertThat (bookManagerServiceImpl.deleteByBookId (bookId + 1)).isEqualTo(false);
+        try {
+            bookManagerServiceImpl.deleteByBookId(bookId + 1);
+            fail ("BookNotFoundException should be raised");
+        } catch (BookNotFoundException ex) {
+            System.out.println(ex);
+        }
 
         verify (mockBookManagerRepository, times (1)).findById(bookId + 1) ;
     }

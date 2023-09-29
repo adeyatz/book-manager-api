@@ -1,5 +1,6 @@
 package com.techreturners.bookmanager.controller;
 
+import com.techreturners.bookmanager.exceptions.BookNotFoundException;
 import com.techreturners.bookmanager.model.Book;
 import com.techreturners.bookmanager.service.BookManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/v1/book")
@@ -45,9 +47,22 @@ public class BookManagerController {
 
     @DeleteMapping({"/{bookId}"})
     public ResponseEntity<String> deleteBookById(@PathVariable Long bookId) {
-        return bookManagerService.deleteByBookId(bookId)
-                ? new ResponseEntity<>(HttpStatus.OK)
-                : new ResponseEntity<>(("Cannot find book with id " + bookId), HttpStatus.BAD_REQUEST);
+            bookManagerService.deleteByBookId(bookId);
+            return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+//    @ExceptionHandler(value = BookNotFoundException.class)
+//    @ResponseStatus(HttpStatus.CONFLICT)
+//    public ResponseEntity handleBookNotFoundException (BookNotFoundException ex)
+//    {
+//        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+//    }
+//
+//    @ExceptionHandler(value = NoSuchElementException.class)
+//    @ResponseStatus(HttpStatus.CONFLICT)
+//    public ResponseEntity handleNoSuchElementException (NoSuchElementException ex)
+//    {
+//        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+//    }
 
 }

@@ -1,5 +1,6 @@
 package com.techreturners.bookmanager.service;
 
+import com.techreturners.bookmanager.exceptions.BookNotFoundException;
 import com.techreturners.bookmanager.model.Book;
 import com.techreturners.bookmanager.repository.BookManagerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class BookManagerServiceImpl implements BookManagerService {
@@ -28,31 +30,33 @@ public class BookManagerServiceImpl implements BookManagerService {
 
     @Override
     public Book getBookById(Long id) {
-        return bookManagerRepository.findById(id).get();
+        return bookManagerRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No book present with ID = " + id));
     }
 
     //User Story 4 - Update Book By Id Solution
     @Override
     public void updateBookById(Long id, Book book) {
-        Book retrievedBook = bookManagerRepository.findById(id).get();
+        Book retrievedBook = bookManagerRepository.findById(id).orElse(null);
 
-        retrievedBook.setTitle(book.getTitle());
-        retrievedBook.setDescription(book.getDescription());
-        retrievedBook.setAuthor(book.getAuthor());
-        retrievedBook.setGenre(book.getGenre());
+        if (retrievedBook != null) {
+            retrievedBook.setTitle(book.getTitle());
+            retrievedBook.setDescription(book.getDescription());
+            retrievedBook.setAuthor(book.getAuthor());
+            retrievedBook.setGenre(book.getGenre());
 
-        bookManagerRepository.save(retrievedBook);
+            bookManagerRepository.save(retrievedBook);
+        } else {
+            throw new BookNotFoundException("The book with id " + id + " cannot be found");
+        }
     }
 
     @Override
-    public boolean deleteByBookId(Long id) {
+    public void deleteByBookId(Long id) {
         // Only delete it if it's there!
-        if (bookManagerRepository.findById(id).isPresent()) {
-            bookManagerRepository.deleteById(id);
-            return true;
-        }
-        // else How do we report an error??
-        return false;
+        bookManagerRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("The book with id " + id + " cannnot be found in the database"));
+        bookManagerRepository.deleteById(id);
     }
 
 }

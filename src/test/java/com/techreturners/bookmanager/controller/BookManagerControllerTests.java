@@ -1,6 +1,7 @@
 package com.techreturners.bookmanager.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.techreturners.bookmanager.exceptions.BookNotFoundException;
 import com.techreturners.bookmanager.model.Book;
 import com.techreturners.bookmanager.model.Genre;
 import com.techreturners.bookmanager.service.BookManagerServiceImpl;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @AutoConfigureMockMvc
@@ -116,9 +118,6 @@ public class BookManagerControllerTests {
 
         Book book = new Book(6L, "Book Six", "This is the description for Book Six", "Person Six", Genre.Fantasy);
 
-        when(mockBookManagerServiceImpl.getBookById(book.getId())).thenReturn(book);
-        when(mockBookManagerServiceImpl.deleteByBookId(book.getId())).thenReturn((true));
-
         this.mockMvcController.perform(
                         MockMvcRequestBuilders.delete("/api/v1/book/" + book.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -128,14 +127,11 @@ public class BookManagerControllerTests {
     @Test
      void testDeleteBookByBadId() throws Exception {
 
-        Book book = new Book(7L, "Book Seven", "This is the description for Book 7", "Person 7", Genre.Fantasy);
+        long unknownBookId = 10;
 
-        when(mockBookManagerServiceImpl.getBookById(book.getId()+1)).thenReturn(book);
-        when(mockBookManagerServiceImpl.deleteByBookId(book.getId()+1)).thenReturn((false));
+        doThrow(new BookNotFoundException("Book with ID " + unknownBookId + " not found")).when(mockBookManagerServiceImpl).deleteByBookId(unknownBookId);
 
-        this.mockMvcController.perform(
-                        MockMvcRequestBuilders.delete("/api/v1/book/" + book.getId() + 1))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        assertThrows (BookNotFoundException.class, () -> mockBookManagerServiceImpl.deleteByBookId(unknownBookId));
     }
 
 }
